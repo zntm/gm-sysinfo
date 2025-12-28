@@ -4,8 +4,10 @@ use vulkano::{
   instance::{Instance, InstanceCreateInfo},
   VulkanLibrary,
 };
+use nvml_wrapper::Nvml;
 
 static mut INSTANCE: Option<Arc<Instance>> = None;
+static mut NVML: Option<Nvml> = None;
 
 pub fn maybe_create_instance() {
   unsafe {
@@ -89,4 +91,27 @@ pub unsafe fn get_gpu_vram() -> u64 {
   }
 
   heap.unwrap().size
+}
+
+pub fn get_gpu_usage() -> f64 {
+  unsafe {
+    if NVML.is_none() {
+      NVML = Nvml::init().ok();
+    }
+
+    match &NVML {
+      Some(nvml) => {
+        match nvml.device_by_index(0) {
+          Ok(device) => {
+            match device.utilization_rates() {
+              Ok(rates) => rates.gpu as f64,
+              Err(_) => -1.0,
+            }
+          }
+          Err(_) => -1.0,
+        }
+      }
+      None => -1.0,
+    }
+  }
 }

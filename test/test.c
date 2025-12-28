@@ -36,7 +36,9 @@ extern const double get_gpu_vram();
 extern double sys_memory_used();
 extern double proc_memory_used();
 extern double sys_cpu_usage();
+extern double sys_cpu_usage_core(double core);
 extern double proc_cpu_usage();
+extern double get_gpu_usage();
 
 int main() {
   // Test is_initialized
@@ -107,6 +109,18 @@ int main() {
   // Test proc_cpu_usage
   printf("Process CPU usage: %f\n", proc_cpu_usage());
   assert(proc_cpu_usage() > -1);
+
+  // Test sys_cpu_usage_core (core 0)
+  printf("Core 0 CPU usage: %f\n", sys_cpu_usage_core(0));
+  assert(sys_cpu_usage_core(0) > -1);
+
+  // Test sys_cpu_usage_core (invalid core)
+  printf("Invalid core usage: %f\n", sys_cpu_usage_core(9999));
+  assert(sys_cpu_usage_core(9999) == -1.0);
+
+  // Test get_gpu_usage (may return -1 if NVML not available)
+  printf("GPU usage: %f\n", get_gpu_usage());
+  assert(get_gpu_usage() >= -1);
 
   printf("All tests passed!\n");
 

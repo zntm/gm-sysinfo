@@ -9,3 +9,7 @@ pub unsafe fn get_gpu_name() -> String {
 pub unsafe fn get_gpu_vram() -> u64 {
   info::get_gpu_vram()
 }
+
+pub unsafe fn get_gpu_usage() -> f64 {
+  info::get_gpu_usage()
+}

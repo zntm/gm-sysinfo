@@ -19,3 +19,7 @@ pub fn get_gpu_vram() -> u64 {
 
   gpus[0].recommended_max_working_set_size()
 }
+
+pub fn get_gpu_usage() -> f64 {
+  -1.0  // Metal does not provide GPU utilization metrics
+}

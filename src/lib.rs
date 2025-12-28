@@ -191,6 +191,16 @@ pub fn get_gpu_vram() -> f64 {
   unsafe { gpu::get_gpu_vram() as f64 }
 }
 
+#[no_mangle]
+pub fn get_gpu_usage() -> f64 {
+  if !is_initialized() {
+    eprintln!("System not initialized!");
+    return -1.0;
+  }
+
+  unsafe { gpu::get_gpu_usage() }
+}
+
 // Get memory used for the system
 #[no_mangle]
 pub fn sys_memory_used() -> f64 {
@@ -254,6 +264,32 @@ pub fn sys_cpu_usage() -> f64 {
     }
 
     total / cpus.len() as f64
+  }
+}
+
+// Get the CPU usage for a specific core
+#[no_mangle]
+pub fn sys_cpu_usage_core(core: f64) -> f64 {
+  if !is_initialized() {
+    eprintln!("System not initialized!");
+    return -1.0;
+  }
+
+  unsafe {
+    SYSTEM.as_mut().unwrap().refresh_cpu();
+    let cpus = SYSTEM.as_mut().unwrap().cpus();
+    let core_idx = core as usize;
+
+    if core_idx >= cpus.len() {
+      eprintln!("Invalid core index: {}", core_idx);
+      return -1.0;
+    }
+
+    let usage = cpus[core_idx].cpu_usage() as f64;
+    if usage.is_nan() {
+      return 0.0;
+    }
+    usage
   }
 }
 
